@@ -1,0 +1,7 @@
+bigrams = LOAD ‘s3://cse6242-bigram-big/*’ AS (bigram:chararray, year:int, count:double, books:double);
+group_bigrams= GROUP bigrams BY bigram;
+appearances= FOREACH group_bigrams GENERATE group, SUM(bigrams.count)/SUM(bigrams.books) as appearance;
+order_appearance = ORDER appearances BY appearance DESC, group ASC;
+result= LIMIT order_appearance 10;
+
+STORE result INTO 's3://cse6242-output/big' USING PigStorage ('\t');
